@@ -1,0 +1,19 @@
+{% extends "user/base.html" %}
+{% block body_block %}
+
+<div class="container">
+  <div class="jumbotron">
+    <h1 class="text-center">Create Poll</h1>
+      <div class="row  well-lg">
+        <div class="container well-lg" style="background:white">
+          <form action="." method="post"  enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ form.as_p }}
+              <input type="submit" value="Post">
+          </form>
+        </div>
+      </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Preffie</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+    ul.errorlist {
+      display:none;
+    }
+    .disabled {
+      pointer-events: none;
+      cursor: default;
+    }
+    .hide {
+      display:none;
+    }
+    </style>
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-static-top py-5">
+      <div class="container">
+        <ul class="nav navbar-nav navbar-left">
+          {# Django Home Link / Admin Link / Register Link#}
+          <li><a class="navbar-brand" href="{% url 'index' %}">Preffie</a></li>
+          <!-- <li><a class="navbar-link" href="{% url 'admin:index' %}">Admin</a></li> -->
+          <li><a class="navbar-link" href="{% url 'poll:create' %}">Create Poll</a></li>
+          <li><a class="navbar-link" href="{% url 'poll:list' %}">Polls</a></li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+          {# Some logic on what to display for last item#}
+          {% if instagram_login %}
+          <li><a class="navbar-link" href="{% url 'user:profile' %}">{{ user.username }}</a></li>
+          {% elif user.is_authenticated %}
+          <li><a class="navbar-link" href="{% url 'user:profile' %}">{{ user.username }}</a></li>
+          {% endif %}
+          <li>
+            {% if instagram_login %}
+              <a class="navbar-link" href="{% url 'user:logout' %}">
+                <span>
+                  <i class="pull-left fa fa-instagram" style="font-size:22px"></i>
+                  Logout
+                </span>
+              </a>
+            {% elif user.is_authenticated %}
+              <a class="navbar-link" href="{% url 'user:logout' %}">
+                <span>
+                  <i class="pull-left fa fa-instagram" style="font-size:22px"></i>
+                  Logout
+                </span>
+              </a>
+            {% else %}
+              <a class="navbar-link" href="{% url 'social:begin' 'instagram' %}">
+                <span>
+                  <i class="pull-left fa fa-instagram" style="font-size:22px"></i>
+                  Login to Instagram
+                </span>
+              </a>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container">
+    {% block body_block %}
+    {% endblock %}
+    </div>
+    <div class="row">
+      <div class="container col-sm-12 col-md-12 col-lg-12 text-center">
+        <p>
+          <a class="" href="{% url 'privacy' %}" style="font-size:small">Privacy</a>
+        </p>
+      </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src=" http://cdn.jsdelivr.net/jquery.cookie/1.4.1/jquery.cookie.min.js "></script>
+
+    <script>
+        var csrftoken = $.cookie('csrftoken');
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        $(document).ready(function(){
+            {% block domready %}
+
+            {% endblock %}
+		});
+    </script>
+
+    <script>
+      function copyToClipboard(element) {
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val($(element).attr("data-href")).select();
+        document.execCommand("copy");
+        $temp.remove();
+      }
+
+      $(".like-btn-a").click(function(e){
+        e.preventDefault()
+        var this_ = $(this)
+        var pollUrl = this_.attr("data-href")
+        if (pollUrl){
+           $.ajax({
+            url: pollUrl,
+            method: "GET",
+            data: {},
+            success: function(data){
+              // console.log(data)
+              this_.children().children(".vote-a-count").text(data.vote_a_count)
+              this_.siblings(".like-btn-b").children().children(".vote-b-count").text(data.vote_b_count)
+              this_.addClass("disabled")
+              this.siblings(".like-btn-b").addClass("disabled")
+            }, error: function(error){
+              console.log(error)
+              console.log("error")
+            }
+          })
+        }
+      });
+
+      $(".like-btn-b").click(function(e){
+        e.preventDefault()
+        var this_ = $(this)
+        var pollUrl = this_.attr("data-href")
+        if (pollUrl){
+           $.ajax({
+            url: pollUrl,
+            method: "GET",
+            data: {},
+            success: function(data){
+              this_.children().children(".vote-b-count").text(data.vote_b_count)
+              this_.siblings(".like-btn-a").children().children(".vote-a-count").text(data.vote_a_count)
+              this_.addClass("disabled")
+              this.siblings(".like-btn-a").addClass("disabled")
+            }, error: function(error){
+              console.log(error)
+              console.log("error")
+            }
+          })
+        }
+      });
+
+      $(".follow-btn").click(function(e){
+        e.preventDefault()
+        var this_ = $(this)
+        var followUrl = this_.attr("data-href")
+        if (followUrl) {
+          $.ajax({
+            url: followUrl,
+            method: "GET",
+            data:{},
+            success: function(data){
+              console.log(data)
+              if (data.follow_status){
+                this_.addClass("hide")
+                alert("You're now following "+data.profile_username+" on Instagram and Preffie!")
+              } else {
+                this_.addClass("hide")
+                alert("You're now unfollowed "+data.profile_username+" on Instagram and Preffie!")
+              }
+            }, error: function(error){
+              console.log(error)
+              console.log("error")
+            }
+          })
+        }
+      });
+
+      $(".share-btn").click(function(e){
+        e.preventDefault()
+        var this_ = $(this)
+        alert(this_.attr("data-href")+" has been copied to clipboard.")
+        copyToClipboard(this_)
+      });
+
+    </script>
+  </body>
+</html>

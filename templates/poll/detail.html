@@ -1,0 +1,91 @@
+{% extends "user/base.html" %}
+
+{% block domready %}
+
+{% endblock %}
+
+{% block body_block %}
+
+<div class="container">
+  <div class="jumbotron">
+    {% if latest_poll_list %}
+      {% for poll in latest_poll_list %}
+        <div class="row well-lg">
+          <div class="container well-lg" style="background:white">
+            <h3 class="text-center">What's your Preffie?</h3>
+            <div class="card-block col-sm-12 col-md-12 col-lg-12">
+              <div class="pull-left">
+                <a href="/user/profile/{{ poll.user.id }}/" style="text-decoration: none;">
+                  <img src="{{ user.profile.profile_picture_url }}" class="img-circle" alt="Cinque Terre" width="50" height="50">
+                  <strong style="font-size:x-large;">{{ poll.user.username }}</strong>
+                </a>
+              </div>
+              <div class="pull-right">
+                <!-- {% if user.username == poll.user.username %}
+                {% elif poll.user.profile.id in follows %}
+                {% else %}
+                  <a class="follow-btn btn btn-default"
+                  data-href='/user/api/{{ poll.user.id }}/follow/'
+                  href="/user/{{ poll.user.id }}/follow/">
+                    Follow
+                  </a>
+                {% endif %} -->
+              </div>
+              <div class="clearfix"></div>
+              <div class="row">
+                <p></p>
+              </div>
+            </div>
+
+            <a class="like-btn-a {% if poll.id in voted_polls %}disabled{% endif %}"
+            data-href='/poll/api/{{ poll.id }}/vote/a/'
+            href="/poll/{{ poll.id }}/vote/a/">
+              <div class="card col-sm-6 col-md-6 col-lg-6 text-center" style="">
+                <img class="img-thumbnail rounded float-left" src="{{ poll.media_a.url }}">
+                  <span class="glyphicon vote-a-count" style="font-size:42px">
+                    {% if poll.id in voted_polls %}
+                    {{ poll.vote_a_count }}
+                    {% endif %}
+                  </span>
+                  <span class="glyphicon glyphicon-heart-empty" style="font-size:30px"></span>
+              </div>
+            </a>
+            <a class="like-btn-b {% if poll.id in voted_polls %}disabled{% endif %}"
+            data-href='/poll/api/{{ poll.id }}/vote/b/'
+            href="/poll/{{ poll.id }}/vote/b/">
+              <div class="card col-sm-6 col-md-6 col-lg-6 text-center" style="">
+                <img class="img-thumbnail rounded float-right" src="{{ poll.media_b.url }}">
+                    <span class="glyphicon vote-b-count" style="font-size:42px">
+                      {% if poll.id in voted_polls %}
+                      {{ poll.vote_b_count }}
+                      {% endif %}
+                    </span>
+                    <span class="glyphicon glyphicon-heart-empty" style="font-size:30px"></span>
+              </div>
+            </a>
+            <div class="card-block col-sm-12 col-md-12 col-lg-12">
+              <div class="row">
+                <p></p>
+              </div>
+              <div class="pull-left">
+                <p><strong>{{ poll.user.username }}</strong> {{ poll.caption }}</p>
+              </div>
+              <div class="pull-right">
+                <a href="/poll/{{ poll.id }}/" class="share-btn btn btn-default"
+                data-href="http://www.preffie.co/poll/detail/{{ poll.id }}/">
+                  Share
+                </a>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+          </div>
+        </div>
+
+      {% endfor %}
+    {% else %}
+        <p>No polls are available.</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
