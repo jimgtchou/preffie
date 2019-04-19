@@ -47,7 +47,7 @@ static==1.1.1
 static3==0.7.0
 tabulate==0.7.5
 termcolor==1.1.0
-urllib3==1.23
+urllib3==1.24.3
 wcwidth==0.1.7
 websocket-client==0.44.0
 whitenoise==3.3.1
